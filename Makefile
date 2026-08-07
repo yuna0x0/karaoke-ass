@@ -33,14 +33,15 @@ check: $(BIN)
 VERSION := $(shell sed -n 's/^version = "\(.*\)"/\1/p' pyproject.toml)
 PACK     = karaoke-ass-template-v$(VERSION)
 
-# The template carries its own version string for when the file is copied out
-# of the repository, so it must not drift from pyproject.toml.
+# Each .ass states its version twice, in the header comment and in the banner
+# Comment line that survives into applied output. Neither may drift from
+# pyproject.toml.
 version-check:
-	@grep -q "TWO-ROW KARAOKE TEMPLATE  v$(VERSION)$$" template/two-row-karaoke.ass \
-		|| { echo "template/two-row-karaoke.ass version does not match pyproject.toml ($(VERSION))"; exit 1; }
-	@for f in examples/*.ass; do \
+	@for f in template/two-row-karaoke.ass examples/*.ass; do \
 		grep -q "TWO-ROW KARAOKE TEMPLATE  v$(VERSION)$$" "$$f" \
-			|| { echo "$$f version does not match pyproject.toml ($(VERSION))"; exit 1; }; \
+			|| { echo "$$f: header version is not $(VERSION)"; exit 1; }; \
+		grep -q "two-row-karaoke v$(VERSION)," "$$f" \
+			|| { echo "$$f: banner version is not $(VERSION)"; exit 1; }; \
 	done
 
 dist: version-check check
