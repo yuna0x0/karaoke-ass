@@ -1,0 +1,104 @@
+[Script Info]
+; ============================================================================
+; TWO-ROW KARAOKE TEMPLATE
+;
+; Copyright (c) 2026 yuna0x0. MIT licence.
+; https://github.com/yuna0x0/karaoke-ass
+;
+; Put syllable-timed lyrics below as Dialogue lines in the Kara style, set the
+; Fontname you want, and run Apply karaoke template. Everything else is
+; derived: row positions, row pitch, ruby offset and every clip box follow the
+; style's Fontsize, Outline, Shadow and Margins. There are no hardcoded pixels.
+;
+; TUNING (the config lines just below the styles)
+;   emfix       0  size correction between the editor's text measurement and
+;                  the renderer. 0 = read it from the font file, which is what
+;                  you want. Set a number to pin it. If the named font is NOT
+;                  INSTALLED this cannot be read, 1.0 is assumed, and a warning
+;                  goes to the automation log: that assumption only holds for
+;                  fonts whose lineGap is 0, so install the font.
+;   layoutmode     1 = row 1 at the left margin, row 2 right-aligned
+;                  2 = centred block, rows nudged apart by indent2
+;                  3 = bottom split in half, each row centred in its half
+;   rubygap        ruby-to-character gap, px. LOWER = tighter. The visual gap
+;                  still varies by font: a font with a small em leaves more
+;                  empty space inside the same line box.
+;   rubyjust    0  0 = centre ruby on its base. 1 = justify it with \fsp.
+;   rowgap         extra clearance between the two rows.
+;   minscale   50  floor for auto-fit compression, percent. A line that hits
+;                  this floor wants splitting, not squeezing.
+;   maxlead  6000  how early a line may appear, row permitting.
+;   minlead  1500  GUARANTEED readable time before the wipe. When time is
+;                  short the HOLD is sacrificed first, never the lead.
+;   postwipe  350  hold after the wipe; shrinks first under pressure.
+;   fadein/out     CEILINGS, auto-clamped so the fade-in finishes fadegap ms
+;                  before the wipe and the fade-out starts after it ends.
+;   nbands      1  1 = flat fill. >1 = vertical gradient slices.
+;   gradhf/gradupf vertical span and lift of the gradient, in units of fs.
+;   rowy1over/rowy2over  set >0 to override automatic row placement.
+;
+; COLOURS: unsung is WHITE fill + BLACK outline, sung is COLOURED fill + WHITE
+;   outline. The outline flipping black to white is half of what makes a line
+;   readable; reversing it is what reads as wrong. Sung default is red
+;   (232,42,72); for blue use wR=32 wG=112 wB=240. b* is the unsung gradient,
+;   w* the sung one, cBaseB and cWipeB the two outline colours.
+;
+; RULES, breaking these breaks the template
+;   - No "keeptags": it prints furigana pipes as literal text.
+;   - No retime() inside a "template line" body: that body runs once PER
+;     SYLLABLE, so retime compounds. retime() belongs in "pre-line".
+;   - Every \t inside a retimed template needs +foff, because retime moves the
+;     line start and \t is measured from it.
+;   - Inline colours are 6-digit &HBBGGRR&; the style table uses 8-digit.
+;   - The loop count in the Effect field must be >= nbands.
+;   - Keep Alignment at 4. The horizontal maths takes the line's left edge from
+;     the margin, not from its own measured width.
+;   - Use the style's Spacing field, not \fsp. Spacing is included in the
+;     measured syllable positions; \fsp is invisible to them and desynchronises
+;     the sweep from the text.
+; ============================================================================
+ScriptType: v4.00+
+WrapStyle: 2
+ScaledBorderAndShadow: yes
+PlayResX: 1920
+PlayResY: 1080
+LayoutResX: 1920
+LayoutResY: 1080
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Kara,Source Han Serif JP Heavy,100,&H00FFFFFF,&H00FFFFFF,&H00301810,&HB4000000,0,0,0,0,100,100,0,0,1,6,3,4,100,100,60,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Comment: 0,0:00:00.00,0:00:00.00,Kara,,0,0,0,code once,maxlead = 6000; minlead = 1500; gap = 120; postwipe = 350; fadein = 300; fadeout = 300; fadegap = 150; rubygap = -6; rubyjust = 0; rowgap = 8; layoutmode = 3; indent2 = 130; minscale = 50; nbands = 1; gradhf = 1.04; gradupf = 0.26; rowy1over = 0; rowy2over = 0; emfix = 0
+Comment: 0,0:00:00.00,0:00:00.00,Kara,,0,0,0,code once,bR1=255; bG1=255; bB1=255; bR2=255; bG2=255; bB2=255; wR1=232; wG1=42; wB1=72; wR2=232; wG2=42; wB2=72; cBaseB = "&H000000&"; cWipeB = "&HFFFFFF&"; prevEnd1 = -999999; prevEnd2 = -999999; prevW1 = -999999; prevW2 = -999999; _n = 0
+Comment: 0,0:00:00.00,0:00:00.00,Kara,,0,0,0,code once,function mix(j,n,ra,ga,ba,rb,gb,bb) local t=(j-0.5)/n; return string.format("&H%02X%02X%02X&", math.floor(ba+(bb-ba)*t+0.5), math.floor(ga+(gb-ga)*t+0.5), math.floor(ra+(rb-ra)*t+0.5)) end
+Comment: 0,0:00:00.00,0:00:00.00,Kara,,0,0,0,code once,function bd() if nbands==1 then return "" else return "\\bord0\\shad0" end end; function ov() if nbands==1 then return "\\alpha&HFF&" else return "\\1a&HFF&" end end; function cbase(j,n) return mix(j,n,bR1,bG1,bB1,bR2,bG2,bB2) end; function cwipe(j,n) return mix(j,n,wR1,wG1,wB1,wR2,wG2,wB2) end
+Comment: 0,0:00:00.00,0:00:00.00,Kara,,0,0,0,code once,function by1(j,n) if j==1 then return otop end; return math.floor(gtop+(j-1)*(gbot-gtop)/n) end; function by2(j,n) if j==n then return obot end; return math.floor(gtop+j*(gbot-gtop)/n)+1 end
+Comment: 0,0:00:00.00,0:00:00.00,Kara,,0,0,0,code once,function chain(y1,y2) local s=""; local n=orgline.kara.n; for i=1,n do local k=orgline.kara[i]; local r=math.floor(orgline.left+k.right*ef*sc+dx+0.5); if i==n then r=r+math.ceil(bord+shad)+1 end; s=s..string.format("\\t(%d,%d,\\clip(%d,%d,%d,%d))", k.start_time+foff, k.end_time+foff, clipL, y1, r, y2) end; return s end
+Comment: 0,0:00:00.00,0:00:00.00,Kara,,0,0,0,code once,function ulen(s) local n=0; local i=1; while i<=#s do local c=s:byte(i); if c<0x80 then i=i+1 elseif c<0xE0 then i=i+2 elseif c<0xF0 then i=i+3 else i=i+4 end; n=n+1 end; return n end
+Comment: 0,0:00:00.00,0:00:00.00,Kara,,0,0,0,code once,function rsp(b,f,s) local n=ulen(s); if n<1 or f>=b then return 0 end; return (b-f)/n end; function bsyl() if syl.isfuri and syl.syl then return syl.syl end; return basesyl end; function rspv() if rubyjust == 0 then return 0 end; local b=bsyl(); if not b then return 0 end; return rsp(b.width*ef, syl.width*ef, syl.text_stripped) end
+Comment: 0,0:00:00.00,0:00:00.00,Kara,,0,0,0,code once,function ry() return math.floor(liney + lh/4 - fs - rubygap) end; function rtopf() return math.floor(ry() + lh/4 - fs/2 - pad) end; function rbotf() return math.ceil(ry() + lh/4 + pad) end; function bctr() local b=bsyl(); if not b then return (syl.left+syl.width/2)*ef end; return (b.left+b.width/2)*ef end; function rubyx() local sp=rspv(); local b=bsyl(); if sp>0 and b then return math.floor(orgline.left+b.left*ef*sc+dx+sp*sc/2+0.5) end; return math.floor(orgline.left+(bctr()-syl.width*ef/2)*sc+dx+0.5) end; function rubyr() local sp=rspv(); local b=bsyl(); if sp>0 and b then return math.floor(orgline.left+(b.left+b.width)*ef*sc+dx+0.5) end; return math.floor(orgline.left+(bctr()+syl.width*ef/2)*sc+dx+0.5) end
+Comment: 0,0:00:00.00,0:00:00.00,Kara,,0,0,0,code once,G = _G; efc = {}; function fbe(s,o,n) local v=0; for i=0,n-1 do v=v*256+s:byte(o+i) end; return v end; function fi16(v) if v>=32768 then return v-65536 end; return v end; function fnorm(s) return (s:lower():gsub("[^%w]","")) end
+Comment: 0,0:00:00.00,0:00:00.00,Kara,,0,0,0,code once,function fdirt(f,off) f:seek("set",off); local h=f:read(12); if not h or #h<12 then return nil end; local n=fbe(h,5,2); local d=f:read(16*n); if not d or #d<16*n then return nil end; local t={}; for i=0,n-1 do local p=i*16+1; t[d:sub(p,p+3)]={off=fbe(d,p+8,4),len=fbe(d,p+12,4)} end; return t end
+Comment: 0,0:00:00.00,0:00:00.00,Kara,,0,0,0,code once,function frdt(f,t,k) local e=t[k]; if not e then return nil end; f:seek("set",e.off); return f:read(e.len) end
+Comment: 0,0:00:00.00,0:00:00.00,Kara,,0,0,0,code once,function ffam(nm) local out={}; if not nm or #nm<6 then return out end; local cnt,so=fbe(nm,3,2),fbe(nm,5,2); for i=0,cnt-1 do local p=7+12*i; if p+11>#nm then break end; local pid,nid=fbe(nm,p,2),fbe(nm,p+6,2); local ln,off=fbe(nm,p+8,2),fbe(nm,p+10,2); if nid==1 or nid==16 then local raw=nm:sub(so+off+1,so+off+ln); if pid==0 or pid==3 then local s,ok="",true; for j=1,#raw,2 do local hi,lo=raw:byte(j),raw:byte(j+1); if hi~=0 or not lo then ok=false; break end; s=s..string.char(lo) end; if ok then out[#out+1]=s end else out[#out+1]=raw end end end; return out end
+Comment: 0,0:00:00.00,0:00:00.00,Kara,,0,0,0,code once,function fmet(path,want) local f=G.io.open(path,"rb"); if not f then return nil end; local offs={0}; if f:read(4)=="ttcf" then f:seek("set",8); local n=fbe(f:read(4),1,4); local d=f:read(4*n); offs={}; for i=0,n-1 do offs[#offs+1]=fbe(d,i*4+1,4) end end; for _,o in G.ipairs(offs) do local t=fdirt(f,o); if t then local hit=false; for _,nm in G.ipairs(ffam(frdt(f,t,"name"))) do if fnorm(nm)==want then hit=true; break end end; if hit then local hd,hh,o2=frdt(f,t,"head"),frdt(f,t,"hhea"),frdt(f,t,"OS/2"); if hd and hh and o2 and #hd>=20 and #hh>=10 and #o2>=78 then local a,de,g=fi16(fbe(hh,5,2)),fi16(fbe(hh,7,2)),fi16(fbe(hh,9,2)); local wa,wd=fi16(fbe(o2,75,2)),fi16(fbe(o2,77,2)); local den=wa+wd; if den==0 then den=fi16(fbe(o2,69,2))-fi16(fbe(o2,71,2)) end; f:close(); if den~=0 then return (a-de+g)/den end; return nil end end end end; f:close(); return nil end
+Comment: 0,0:00:00.00,0:00:00.00,Kara,,0,0,0,code once,function fdirs() local h=G.os.getenv("HOME") or ""; local w=G.os.getenv("WINDIR"); if w then return {w.."\\Fonts",(G.os.getenv("LOCALAPPDATA") or "").."\\Microsoft\\Windows\\Fonts"} end; return {h.."/Library/Fonts","/Library/Fonts","/System/Library/Fonts","/System/Library/Fonts/Supplemental",h.."/.local/share/fonts",h.."/.fonts","/usr/share/fonts","/usr/local/share/fonts"} end
+Comment: 0,0:00:00.00,0:00:00.00,Kara,,0,0,0,code once,function fwalk(lfs,dir,want,depth) if depth>3 then return nil end; local ok,it,st=G.pcall(lfs.dir,dir); if not ok or not it then return nil end; for e in it,st do if e~="." and e~=".." then local p=dir.."/"..e; local m=lfs.attributes(p,"mode"); if m=="directory" then local r=fwalk(lfs,p,want,depth+1); if r then return r end elseif e:lower():match("%.[ot]t[fc]$") then local okm,r=G.pcall(fmet,p,want); if okm and r then return r end end end end; return nil end
+Comment: 0,0:00:00.00,0:00:00.00,Kara,,0,0,0,code once,function efix(name) if efc[name] then return efc[name] end; if G.os.getenv("WINDIR") then G.aegisub.debug.out(4,"emfix 1.0 on Windows: the editor measures with GDI there, which sizes by the same win metrics the renderer uses\n"); efc[name]=1; return 1 end; local v,found=1,false; local ok,lfs=G.pcall(G.require,"aegisub.lfs"); if not ok then ok,lfs=G.pcall(G.require,"lfs") end; if ok and lfs then local want=fnorm(name); for _,d in G.ipairs(fdirs()) do local r=fwalk(lfs,d,want,1); if r then v=r; found=true; break end end end; if found then G.aegisub.debug.out(4,"emfix %.4f for '%s'\n",v,name) else G.aegisub.debug.out(2,"font '%s' not found: using emfix 1.0, which is wrong for any font with a line gap. Install the font, or set emfix by hand.\n",name) end; efc[name]=v; return v end
+Comment: 0,0:00:00.00,0:00:00.00,Kara,,0,0,0,code line,st = orgline.styleref; ef = (emfix > 0) and emfix or efix(st.fontname); fs = st.fontsize; rfs = fs * 0.5; bord = st.outline or 0; shad = st.shadow or 0; pad = math.ceil(bord + shad + fs * 0.30); lh = orgline.height; if not lh or lh < 1 then lh = fs * 1.2 end; rh = lh * 0.5; gbase = lh/2; resx = meta.res_x; resy = meta.res_y; ml = orgline.eff_margin_l; mr = orgline.eff_margin_r; mv = orgline.eff_margin_v; usable = resx - ml - mr; lw = orgline.width * ef; sc = 1; if lw > usable and lw > 0 then sc = usable / lw; if sc < minscale/100 then sc = minscale/100 end end; scp = math.floor(sc * 100); if scp < 1 then scp = 1 end; sc = scp / 100; ew = lw * sc; pitch = math.ceil(1.5*fs + rubygap + rowgap); ry2 = resy - mv - gbase; ry1 = ry2 - pitch; if ry1 + gbase - 1.5*fs - rubygap < 0 then ry1 = math.ceil(1.5*fs + rubygap - gbase) end; if rowy1over > 0 then ry1 = rowy1over end; if rowy2over > 0 then ry2 = rowy2over end
+Comment: 0,0:00:00.00,0:00:00.00,Kara,,0,0,0,code line,_n = _n + 1; row = 2 - (_n % 2); if orgline.actor == "top" then row = 1 elseif orgline.actor == "bot" then row = 2 end; prev = (row == 1) and prevEnd1 or prevEnd2; prevw = (row == 1) and prevW1 or prevW2; dstart = math.max(orgline.start_time - maxlead, prev + gap); if dstart > orgline.start_time - minlead then dstart = orgline.start_time - minlead end; if dstart < prevw then dstart = prevw end; if dstart < 0 then dstart = 0 end; dend = orgline.end_time + postwipe; if row == 1 then prevEnd1 = dend; prevW1 = orgline.end_time else prevEnd2 = dend; prevW2 = orgline.end_time end
+Comment: 0,0:00:00.00,0:00:00.00,Kara,,0,0,0,code line,half = indent2/2; local lo = ml - orgline.left; local hi = resx - mr - ew - orgline.left; if hi < lo then hi = lo end; if layoutmode == 1 then dx = (row == 2) and hi or lo elseif layoutmode == 3 then local secc = (row == 1) and (ml + resx/2)/2 or (resx/2 + resx - mr)/2; dx = secc - ew/2 - orgline.left else local cx = (resx - ew)/2 - orgline.left; if row == 1 then dx = cx - half else dx = cx + half end end; if dx < lo then dx = lo end; if dx > hi then dx = hi end; dx = math.floor(dx + 0.5)
+Comment: 0,0:00:00.00,0:00:00.00,Kara,,0,0,0,code line,liney = math.floor((row == 1) and ry1 or ry2); fy = math.floor(liney + lh/4 - fs - rubygap); vtop = math.floor(liney + gbase - fs - pad); vbot = math.ceil(liney + gbase + pad); otop = math.floor(liney + gbase - 2*fs); obot = math.ceil(liney + gbase + fs); rtop = math.floor(fy - rh/2 - pad); rbot = math.ceil(fy + rh/2 + pad); rpad = math.ceil(pad * 0.7); gtop = liney - fs*gradupf - fs*gradhf/2; gbot = gtop + fs*gradhf; clipL = math.floor(orgline.left + dx - pad); clipR = math.ceil(orgline.left + lw + dx + pad); foff = orgline.start_time - dstart; lead = orgline.start_time - dstart; fin = math.floor(math.min(fadein, math.max(0, lead - fadegap))); fout = math.floor(math.min(fadeout, dend - orgline.end_time))
+Comment: 0,0:00:00.00,0:00:00.00,Kara,,0,0,0,template pre-line,!retime("set",dstart,dend)!{\an4\fscx!scp!\pos(!$lleft+dx!,!liney!)!ov()!\3c!cBaseB!\fad(!fin!,!fout!)}
+Comment: 1,0:00:00.00,0:00:00.00,Kara,,0,0,0,template pre-line loop 8,!maxloop(nbands)!!retime("set",dstart,dend)!{\an4\fscx!scp!\pos(!$lleft+dx!,!liney!)!bd()!\3c!cBaseB!\1c!cbase(j,maxj)!\clip(0,!by1(j,maxj)!,!resx!,!by2(j,maxj)!)\fad(!fin!,!fout!)}
+Comment: 2,0:00:00.00,0:00:00.00,Kara,,0,0,0,template pre-line,!retime("set",dstart,dend)!{\an4\fscx!scp!\pos(!$lleft+dx!,!liney!)!ov()!\3c!cWipeB!\clip(!clipL!,!otop!,!clipL!,!obot!)!chain(otop,obot)!\fad(!fin!,!fout!)}
+Comment: 3,0:00:00.00,0:00:00.00,Kara,,0,0,0,template pre-line loop 8,!maxloop(nbands)!!retime("set",dstart,dend)!{\an4\fscx!scp!\pos(!$lleft+dx!,!liney!)!bd()!\3c!cWipeB!\1c!cwipe(j,maxj)!\clip(!clipL!,!by1(j,maxj)!,!clipL!,!by2(j,maxj)!)!chain(by1(j,maxj),by2(j,maxj))!\fad(!fin!,!fout!)}
+Comment: 4,0:00:00.00,0:00:00.00,Kara,,0,0,0,template furi,!retime("set",dstart,dend)!{\an4\fscx!scp!\pos(!rubyx()!,!ry()!)\fsp!rspv()!\1c!cbase(1,1)!\3c!cBaseB!\fad(!fin!,!fout!)}
+Comment: 5,0:00:00.00,0:00:00.00,Kara,,0,0,0,template furi,!retime("set",dstart,dend)!{\an4\fscx!scp!\pos(!rubyx()!,!ry()!)\fsp!rspv()!\1c!cwipe(1,1)!\3c!cWipeB!\clip(!rubyx()-rpad!,!rtopf()!,!rubyx()-rpad!,!rbotf()!)\t(!$start+foff!,!$start+foff+$dur!,\clip(!rubyx()-rpad!,!rtopf()!,!rubyr()+rpad!,!rbotf()!))\fad(!fin!,!fout!)}
+Dialogue: 0,0:00:01.00,0:00:05.60,Kara,,0,0,0,,{\kf90}sa{\kf60}mi{\kf90}a{\kf60}do{\kf90}sti{\kf70}a
+Dialogue: 0,0:00:05.85,0:00:09.55,Kara,,0,0,0,,{\kf80}ri{\kf60}a{\kf80}di{\kf60}ti{\kf90}da
+Dialogue: 0,0:00:09.80,0:00:15.70,Kara,,0,0,0,,{\kf70}to{\kf70}ri{\kf70}a{\kf70}di{\kf70}to{\kf90}ma{\kf80}do{\kf70}ra
+Dialogue: 0,0:00:15.95,0:00:20.85,Kara,,0,0,0,,{\kf90}es{\kf70}ti{\kf90}a{\kf70}mo{\kf90}ri{\kf80}ta

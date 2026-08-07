@@ -1,0 +1,37 @@
+# build output
+bin/
+build/
+*.o
+
+# python
+.venv/
+__pycache__/
+*.py[cod]
+
+# applied output and renders
+*-applied.ass
+*.ppm
+*.png
+!assets/**
+
+# media: source video and audio never belong in the repo
+*.mp4
+*.mkv
+*.webm
+*.mov
+*.wav
+*.flac
+*.m4a
+*.mp3
+
+# editor and OS noise
+.DS_Store
+Thumbs.db
+*.ass.bak
+*~
+
+# ruff
+.ruff_cache/
+
+# build artifacts
+dist/
