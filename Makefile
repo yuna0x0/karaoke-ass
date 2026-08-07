@@ -33,7 +33,17 @@ check: $(BIN)
 VERSION := $(shell sed -n 's/^version = "\(.*\)"/\1/p' pyproject.toml)
 PACK     = karaoke-ass-template-v$(VERSION)
 
-dist: check
+# The template carries its own version string for when the file is copied out
+# of the repository, so it must not drift from pyproject.toml.
+version-check:
+	@grep -q "TWO-ROW KARAOKE TEMPLATE  v$(VERSION)$$" template/two-row-karaoke.ass \
+		|| { echo "template/two-row-karaoke.ass version does not match pyproject.toml ($(VERSION))"; exit 1; }
+	@for f in examples/*.ass; do \
+		grep -q "TWO-ROW KARAOKE TEMPLATE  v$(VERSION)$$" "$$f" \
+			|| { echo "$$f version does not match pyproject.toml ($(VERSION))"; exit 1; }; \
+	done
+
+dist: version-check check
 	rm -rf dist build/$(PACK)
 	uv build --wheel
 	mkdir -p build/$(PACK)/karaoke-ass-template
@@ -46,4 +56,4 @@ clean:
 	rm -f bin/assprobe bin/assprobe.exe bin/.extents-cache-*.tsv
 	rm -rf src/karaoke_ass/__pycache__ build dist
 
-.PHONY: all check clean dist
+.PHONY: all check clean dist version-check
