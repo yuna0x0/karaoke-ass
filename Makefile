@@ -45,11 +45,11 @@ version-check:
 	done
 
 dist: version-check check
-	rm -rf dist build/$(PACK)
+	rm -rf dist build
 	uv build --wheel
-	mkdir -p build/$(PACK)/karaoke-ass-template
-	cp -R template examples LICENSE README.md build/$(PACK)/karaoke-ass-template/
-	cd build/$(PACK) && zip -qr ../../dist/$(PACK).zip karaoke-ass-template
+	mkdir -p build/$(PACK)
+	cp -R template examples LICENSE README.md build/$(PACK)/
+	cd build && zip -qr ../dist/$(PACK).zip $(PACK)
 	@echo
 	@ls -l dist
 
