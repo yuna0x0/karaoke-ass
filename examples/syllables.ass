@@ -1,8 +1,8 @@
 [Script Info]
 ; ============================================================================
-; TWO-ROW KARAOKE TEMPLATE  v1.0.3
+; TWO-ROW KARAOKE TEMPLATE  v1.0.4
 ;
-; Copyright (c) 2026 yuna0x0. MIT licence.
+; Copyright (c) 2026 yuna0x0. MIT license.
 ; https://github.com/yuna0x0/karaoke-ass
 ;
 ; Put syllable-timed lyrics below as Dialogue lines in the Kara style, set the
@@ -71,7 +71,7 @@ Style: Kara,Source Han Serif JP Heavy,100,&H00FFFFFF,&H00FFFFFF,&H00301810,&HB40
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
-Comment: 0,0:00:00.00,0:00:00.00,Kara,,0,0,0,,two-row-karaoke v1.0.3, Copyright (c) 2026 yuna0x0, MIT licence, https://github.com/yuna0x0/karaoke-ass
+Comment: 0,0:00:00.00,0:00:00.00,Kara,,0,0,0,,two-row-karaoke v1.0.4, Copyright (c) 2026 yuna0x0, MIT license, https://github.com/yuna0x0/karaoke-ass
 Comment: 0,0:00:00.00,0:00:00.00,Kara,,0,0,0,code once,maxlead = 6000; minlead = 1500; gap = 120; postwipe = 350; fadein = 300; fadeout = 300; fadegap = 150; rubygap = -6; rubyjust = 0; rowgap = 8; layoutmode = 3; indent2 = 130; minscale = 50; nbands = 1; gradhf = 1.04; gradupf = 0.26; rowy1over = 0; rowy2over = 0; emfix = 0
 Comment: 0,0:00:00.00,0:00:00.00,Kara,,0,0,0,code once,bR1=255; bG1=255; bB1=255; bR2=255; bG2=255; bB2=255; wR1=232; wG1=42; wB1=72; wR2=232; wG2=42; wB2=72; cBaseB = "&H000000&"; cWipeB = "&HFFFFFF&"; prevEnd1 = -999999; prevEnd2 = -999999; prevW1 = -999999; prevW2 = -999999; _n = 0
 Comment: 0,0:00:00.00,0:00:00.00,Kara,,0,0,0,code once,function mix(j,n,ra,ga,ba,rb,gb,bb) local t=(j-0.5)/n; return string.format("&H%02X%02X%02X&", math.floor(ba+(bb-ba)*t+0.5), math.floor(ga+(gb-ga)*t+0.5), math.floor(ra+(rb-ra)*t+0.5)) end

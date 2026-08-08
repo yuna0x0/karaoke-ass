@@ -1,6 +1,6 @@
 [project]
 name = "karaoke-ass"
-version = "1.0.3"
+version = "1.0.4"
 description = "Two-row karaoke subtitle template for ASS, with furigana"
 readme = "README.md"
 license = "MIT"
